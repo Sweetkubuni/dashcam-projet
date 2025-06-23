@@ -1,0 +1,24 @@
+services:
+  mediamtx:
+    container_name: mediamtx
+    image: bluenviron/mediamtx:latest-ffmpeg-rpi
+    restart: always
+    network_mode: host
+    privileged: true
+    tmpfs: /dev/shm:exec
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ./recordings:/recordings
+    environment:
+      - MTX_PATHS_CAM_SOURCE=rpiCamera
+
+      # --- Recording Settings ---
+      - MTX_PATHS_CAM_RECORD=yes
+      - MTX_PATHS_CAM_RECORDPATH=./recordings/%path/%Y-%m-%d_%H-%M-%S-%f
+      - MTX_PATHS_CAM_RECORDPARTDURATION=1h
+      - MTX_PATHS_CAM_RECORDSEGMENTDURATION=1h
+      - MTX_LOGLEVEL=info
+      - MTX_API=yes
+      - MTX_PLAYBACK=yes # Enable the HTTP playback server
+      - MTX_PLAYBACKADDRESS=:9996 # Listen on all interfaces, port 8888 (e.g., for HLS, WebRTC)
+    command: /mediamtx.yml

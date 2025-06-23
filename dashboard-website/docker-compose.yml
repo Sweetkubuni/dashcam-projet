@@ -1,0 +1,11 @@
+services:
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: my-go-webserver:latest
+    ports:
+      - "80:8080"
+    container_name: go-webserver-app
+    pull_policy: always
+    restart: always

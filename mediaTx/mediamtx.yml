@@ -1,0 +1,11 @@
+logLevel: info
+
+paths:
+  cam:
+    source: rpiCamera # This is the source type that causes the fork/exec error
+    record: yes
+    recordPath: ./recordings/%path/%Y-%m-%d_%H-%M-%S-%f
+    recordPartDuration: 5h
+    recordSegmentDuration: 1h
+
+api: yes

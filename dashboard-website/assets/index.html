@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Links</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .video-rows-container {
+            width: 100%;
+            max-height: 70vh; /* Adjust as needed */
+            overflow-y: auto;
+            padding-right: 10px; /* For scrollbar spacing */
+        }
+
+        .video-row {
+            display: flex;
+            /* No flex-wrap needed as each row only has one item */
+            justify-content: center; /* Center the single squircle */
+            padding: 15px 0; /* Vertical padding for spacing between rows */
+            border-bottom: 1px solid #eee;
+        }
+
+        .video-row:last-child {
+            border-bottom: none;
+        }
+
+        .squircle {
+            width: 100%; /* Take full width of its parent .video-row */
+            max-width: 450px; /* Max width to prevent it from being too wide on large screens */
+            min-height: 90px; /* Minimum height to ensure content fits comfortably */
+            background-color: #3498db; /* Blue color */
+            border-radius: 15px; /* Sets the radius of the rounded corners */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            font-size: 1em;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box; /* Include padding in the width/height calculation */
+
+            /* Padding for the text content */
+            padding: 15px 30px; /* Top/bottom 15px, left/right 30px */
+            word-break: break-word; /* Ensure text breaks within the squircle if very long */
+        }
+
+        .squircle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .squircle .date-time {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            white-space: nowrap; /* Prevent date/time from wrapping if possible */
+        }
+
+        .squircle .watch-text {
+            font-size: 0.9em;
+            white-space: nowrap; /* Prevent "Watch Video" from wrapping if possible */
+        }
+
+        /* Scrollbar styling */
+        .video-rows-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .video-rows-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .video-rows-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .video-rows-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .squircle {
+                padding: 10px 20px; /* Reduce padding on smaller screens */
+                min-height: 80px;
+            }
+            .squircle .date-time {
+                font-size: 1em;
+            }
+            .squircle .watch-text {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Recent Videos</h1>
+        <div class="video-rows-container">
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-18 10:00 AM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-2" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-17 03:30 PM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-3" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-16 09:15 AM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-4" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-15 01:00 PM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-5" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-14 11:45 AM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-6" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-13 04:00 PM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-7" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-12 08:30 AM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-8" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-11 02:10 PM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-9" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-10 10:00 AM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            <div class="video-row">
+                <a href="https://www.youtube.com/watch?v=another-video-id-10" target="_blank" class="squircle">
+                    <span class="date-time">2025-06-09 03:30 PM</span>
+                    <span class="watch-text">Watch Video</span>
+                </a>
+            </div>
+            </div>
+    </div>
+</body>
+</html>
