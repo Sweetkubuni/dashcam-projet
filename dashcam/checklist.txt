@@ -1,0 +1,140 @@
+╔═══════════════════════════════════════════════════════════════╗
+║     DASHCAM SERVICE - INSTALLATION CHECKLIST                  ║
+╚═══════════════════════════════════════════════════════════════╝
+
+PRE-INSTALLATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Read START_HERE.md for overview
+□ Read DEPLOYMENT_GUIDE.md for detailed instructions
+□ Raspberry Pi is running and accessible via SSH
+□ Docker is installed: sudo systemctl status docker
+□ Camera is connected and enabled: libcamera-hello --list-cameras
+□ Existing dashcam scripts are in ~/dashcam directory
+□ All 16 files from this package are downloaded
+
+INSTALLATION STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ SSH into Raspberry Pi: ssh pi@dashcam.local
+□ Navigate to dashcam directory: cd ~/dashcam
+□ Copy all service files to this directory
+□ Make installer executable: chmod +x install-dashcam-service.sh
+□ Run installer: sudo ./install-dashcam-service.sh
+□ Verify installation: systemctl list-unit-files | grep dashcam
+
+INITIAL SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Start services: sudo dashcamctl start
+□ Wait 10 seconds for startup
+□ Check health: dashcamctl health
+□ All health checks show ✓ green checkmarks
+□ Test stream in browser: http://dashcam.local:8888/dashcam
+□ Video stream is visible and smooth
+
+OPTIONAL - AUTO-START ON BOOT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Enable auto-start: sudo dashcamctl enable
+□ Verify enabled: systemctl is-enabled dashcam-mediamtx.service
+□ Reboot to test: sudo reboot
+□ After reboot, check status: dashcamctl status
+□ Services started automatically
+
+OPTIONAL - RECORDING MODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Switch to recording: sudo dashcamctl mode recording
+□ Restart services: sudo dashcamctl restart
+□ Verify mode: dashcamctl mode
+□ Check recordings directory: ls -lh ~/dashcam/recordings/
+□ Wait a few minutes and check for video files
+
+OPTIONAL - REST API
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Check Flask installed: python3 -c "import flask"
+□ If not: pip3 install flask --break-system-packages
+□ Start API: sudo systemctl start dashcam-api.service
+□ Enable API: sudo systemctl enable dashcam-api.service
+□ Test API: curl http://localhost:5000/health
+□ API returns JSON response
+
+VERIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ dashcamctl health shows all ✓ checks
+□ dashcamctl status shows services running
+□ Stream accessible via browser
+□ No errors in logs: dashcamctl logs
+□ (If recording) Video files appear in recordings directory
+□ (If auto-start) Services start after reboot
+□ (If API) API responds to curl requests
+
+TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If something doesn't work:
+
+1. Check logs
+   □ dashcamctl logs
+   □ Look for error messages
+
+2. Check Docker
+   □ sudo systemctl status docker
+   □ docker ps -a
+   □ sudo systemctl start docker
+
+3. Check ports
+   □ sudo ss -tulpn | grep 8554
+   □ sudo ss -tulpn | grep 8888
+
+4. Check camera
+   □ libcamera-hello --list-cameras
+   □ Should list detected cameras
+
+5. Restart everything
+   □ sudo dashcamctl restart
+   □ Wait 10 seconds
+   □ dashcamctl health
+
+6. Review documentation
+   □ DEPLOYMENT_GUIDE.md has detailed troubleshooting
+   □ DASHCAM_SERVICE_DOCS.md has more info
+
+COMMON ISSUES & SOLUTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Issue: Services won't start
+Solution: Check Docker is running, check for port conflicts
+
+Issue: Camera service fails
+Solution: Verify MediaMTX is running first (dashcamctl health)
+
+Issue: Permission denied
+Solution: Run commands with sudo, check file ownership
+
+Issue: Stream not accessible
+Solution: Check firewall, verify services are running
+
+Issue: Recording not working
+Solution: Check mode (dashcamctl mode), verify recordings dir exists
+
+QUICK COMMAND REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Status:     dashcamctl health
+Start:      sudo dashcamctl start
+Stop:       sudo dashcamctl stop
+Restart:    sudo dashcamctl restart
+Logs:       dashcamctl logs
+Mode:       dashcamctl mode
+Switch:     sudo dashcamctl mode recording && sudo dashcamctl restart
+Enable:     sudo dashcamctl enable
+
+COMPLETION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ All required checks completed
+□ All desired optional features configured
+□ Stream tested and working
+□ Documentation saved for future reference
+□ QUICK_REFERENCE.txt printed or bookmarked
+
+🎉 CONGRATULATIONS! Your dashcam is now a professional service!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+For help: dashcamctl help
+For docs: cat DASHCAM_SERVICE_DOCS.md
+For API:  curl http://localhost:5000/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

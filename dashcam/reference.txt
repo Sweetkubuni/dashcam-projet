@@ -1,0 +1,93 @@
+╔════════════════════════════════════════════════════════════════╗
+║          DASHCAM SERVICE - QUICK REFERENCE CARD                ║
+╚════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────┐
+│ INSTALLATION                                                   │
+└────────────────────────────────────────────────────────────────┘
+  cd ~/dashcam
+  chmod +x install-dashcam-service.sh
+  sudo ./install-dashcam-service.sh
+  sudo dashcamctl start
+  sudo dashcamctl enable
+
+┌────────────────────────────────────────────────────────────────┐
+│ MOST COMMON COMMANDS                                           │
+└────────────────────────────────────────────────────────────────┘
+  dashcamctl health              # Check system health
+  dashcamctl status              # Quick status check
+  sudo dashcamctl restart        # Restart all services
+  dashcamctl logs                # View live logs
+
+┌────────────────────────────────────────────────────────────────┐
+│ SERVICE CONTROL                                                │
+└────────────────────────────────────────────────────────────────┘
+  sudo dashcamctl start          # Start services
+  sudo dashcamctl stop           # Stop services
+  sudo dashcamctl restart        # Restart services
+  sudo dashcamctl enable         # Auto-start on boot
+  sudo dashcamctl disable        # Disable auto-start
+
+┌────────────────────────────────────────────────────────────────┐
+│ RECORDING MODE                                                 │
+└────────────────────────────────────────────────────────────────┘
+  dashcamctl mode                # Show current mode
+  sudo dashcamctl mode minimal   # Stream only (no recording)
+  sudo dashcamctl mode recording # Stream + record to disk
+  sudo dashcamctl restart        # Apply mode change
+
+┌────────────────────────────────────────────────────────────────┐
+│ LOGS & DEBUGGING                                               │
+└────────────────────────────────────────────────────────────────┘
+  dashcamctl logs                # All logs (Ctrl+C to exit)
+  dashcamctl logs-mediamtx       # MediaMTX logs only
+  dashcamctl logs-camera         # Camera logs only
+
+┌────────────────────────────────────────────────────────────────┐
+│ ACCESS URLS (after services start)                            │
+└────────────────────────────────────────────────────────────────┘
+  HLS:  http://dashcam.local:8888/dashcam
+  RTSP: rtsp://dashcam.local:8554/dashcam
+  API:  http://dashcam.local:5000/health
+
+┌────────────────────────────────────────────────────────────────┐
+│ REST API EXAMPLES                                              │
+└────────────────────────────────────────────────────────────────┘
+  # Start the API service first
+  sudo systemctl start dashcam-api.service
+  
+  # Health check
+  curl http://localhost:5000/health
+  
+  # Switch to recording mode
+  curl -X POST http://localhost:5000/mode \
+    -H "Content-Type: application/json" \
+    -d '{"mode": "recording"}'
+  
+  # Restart all services
+  curl -X POST http://localhost:5000/restart \
+    -H "Content-Type: application/json" \
+    -d '{"service": "all"}'
+
+┌────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                │
+└────────────────────────────────────────────────────────────────┘
+  dashcamctl health              # Check what's wrong
+  dashcamctl logs                # View error messages
+  sudo systemctl status docker   # Check Docker is running
+  ss -tulpn | grep 8554          # Check RTSP port
+  sudo dashcamctl restart        # Try restarting
+
+┌────────────────────────────────────────────────────────────────┐
+│ FILES & LOCATIONS                                              │
+└────────────────────────────────────────────────────────────────┘
+  Config:     /etc/dashcam/dashcam.conf
+  Recordings: ~/dashcam/recordings/
+  CLI Tool:   /usr/local/bin/dashcamctl
+  Services:   /etc/systemd/system/dashcam-*.service
+
+┌────────────────────────────────────────────────────────────────┐
+│ NEED HELP?                                                     │
+└────────────────────────────────────────────────────────────────┘
+  dashcamctl help                # Show all commands
+  cat DASHCAM_SERVICE_DOCS.md    # Read full documentation
