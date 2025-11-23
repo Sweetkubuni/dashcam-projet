@@ -1,0 +1,1086 @@
+<h1 id="dashcam-service-system---complete-documentation">Dashcam Service
+System - Complete Documentation</h1>
+<p>A comprehensive systemd-based service management system for your
+Raspberry Pi dashcam with MediaMTX and camera streaming.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Systemd Integration</strong>: Full systemd service
+management with automatic restarts</li>
+<li><strong>Two Recording Modes</strong>: Switch between minimal
+(streaming only) and recording modes</li>
+<li><strong>Dependency Management</strong>: Camera service automatically
+waits for MediaMTX to be ready</li>
+<li><strong>CLI Control</strong>: Easy-to-use command-line interface
+(<code>dashcamctl</code>)</li>
+<li><strong>REST API</strong>: Optional HTTP microservice for remote
+control and monitoring</li>
+<li><strong>Health Monitoring</strong>: Comprehensive health checks for
+all components</li>
+<li><strong>Auto-start</strong>: Optional boot-time startup</li>
+</ul>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="installation">Installation</h3>
+<ol type="1">
+<li><p>Navigate to your dashcam directory (where your scripts are):</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/dashcam</span></code></pre></div></li>
+<li><p>Make the installation script executable and run it:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x install-dashcam-service.sh</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span></code></pre></div></li>
+<li><p>Start the services:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span></code></pre></div></li>
+<li><p>Check status:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span></code></pre></div></li>
+</ol>
+<h3 id="enable-auto-start-on-boot">Enable Auto-start on Boot</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span></code></pre></div>
+<h2 id="cli-usage---dashcamctl">CLI Usage - dashcamctl</h2>
+<h3 id="service-control">Service Control</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start all services</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop all services</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl stop</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart all services</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Individual service control</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start-mediamtx</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl stop-camera</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart-mediamtx</span></code></pre></div>
+<h3 id="status-health">Status &amp; Health</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick status</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> status</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Detailed health check</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span></code></pre></div>
+<h3 id="recording-mode">Recording Mode</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show current mode</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> mode</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch to recording mode</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode recording</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch to minimal mode (streaming only)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode minimal</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h3 id="logs">Logs</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View logs from both services</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View MediaMTX logs only</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs-mediamtx</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># View camera logs only</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs-camera</span></code></pre></div>
+<h3 id="boot-configuration">Boot Configuration</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable auto-start on boot</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Disable auto-start</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl disable</span></code></pre></div>
+<h2 id="rest-api-microservice">REST API Microservice</h2>
+<p>The optional REST API provides remote control and monitoring via
+HTTP.</p>
+<h3 id="start-the-api">Start the API</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start dashcam-api.service</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable dashcam-api.service  <span class="co"># Auto-start on boot</span></span></code></pre></div>
+<p>The API runs on port 5000 by default.</p>
+<h3 id="api-endpoints">API Endpoints</h3>
+<h4 id="get-health">GET /health</h4>
+<p>Detailed health check of all components.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/health</span></code></pre></div>
+<p>Response:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;healthy&quot;</span><span class="fu">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;health_score&quot;</span><span class="fu">:</span> <span class="st">&quot;5/5&quot;</span><span class="fu">,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;mode&quot;</span><span class="fu">:</span> <span class="st">&quot;minimal&quot;</span><span class="fu">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;components&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;mediamtx&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;service_running&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rtsp_port_open&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;api_responding&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;camera&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;service_running&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;stream_active&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;urls&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;hls&quot;</span><span class="fu">:</span> <span class="st">&quot;http://localhost:8888/dashcam&quot;</span><span class="fu">,</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;rtsp&quot;</span><span class="fu">:</span> <span class="st">&quot;rtsp://localhost:8554/dashcam&quot;</span><span class="fu">,</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;api&quot;</span><span class="fu">:</span> <span class="st">&quot;http://localhost:9997&quot;</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h4 id="get-status">GET /status</h4>
+<p>Simple status check.</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/status</span></code></pre></div>
+<h4 id="get-mode">GET /mode</h4>
+<p>Get current recording mode.</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/mode</span></code></pre></div>
+<h4 id="post-mode">POST /mode</h4>
+<p>Switch recording mode.</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch to recording mode</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/mode <span class="dt">\</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;mode&quot;: &quot;recording&quot;}&#39;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch to minimal mode</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/mode <span class="dt">\</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;mode&quot;: &quot;minimal&quot;}&#39;</span></span></code></pre></div>
+<p>Note: After switching modes, you must restart services:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h4 id="post-restart">POST /restart</h4>
+<p>Restart services via API.</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart all services</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/restart <span class="dt">\</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;service&quot;: &quot;all&quot;}&#39;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart only MediaMTX</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/restart <span class="dt">\</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;service&quot;: &quot;mediamtx&quot;}&#39;</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart only camera</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/restart <span class="dt">\</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;service&quot;: &quot;camera&quot;}&#39;</span></span></code></pre></div>
+<h2 id="configuration">Configuration</h2>
+<p>Configuration file location:
+<code>/etc/dashcam/dashcam.conf</code></p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dashcam Service Configuration</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="va">MEDIAMTX_MODE</span><span class="op">=</span>minimal          <span class="co"># or &#39;recording&#39;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="va">BASE_DIR</span><span class="op">=</span>/home/pi/dashcam      <span class="co"># Your dashcam directory</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="va">RECORDINGS_DIR</span><span class="op">=</span>/home/pi/dashcam/recordings</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="va">STREAM_NAME</span><span class="op">=</span>dashcam</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="va">VIDEO_WIDTH</span><span class="op">=</span>1920</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="va">VIDEO_HEIGHT</span><span class="op">=</span>1080</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="va">FRAMERATE</span><span class="op">=</span>30</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="va">BITRATE</span><span class="op">=</span>5000000</span></code></pre></div>
+<p>After modifying the config file, restart services:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h2 id="recording-modes">Recording Modes</h2>
+<h3 id="minimal-mode">Minimal Mode</h3>
+<ul>
+<li>Streaming only (RTSP/HLS)</li>
+<li>No recording to disk</li>
+<li>Lower resource usage</li>
+<li>Suitable for live monitoring</li>
+</ul>
+<h3 id="recording-mode-1">Recording Mode</h3>
+<ul>
+<li>Streaming (RTSP/HLS) + Recording</li>
+<li>Records to <code>/home/pi/dashcam/recordings/</code></li>
+<li>10-second MP4 segments</li>
+<li>Auto-deletes recordings older than 24 hours</li>
+<li>Organized by date/time</li>
+</ul>
+<h2 id="accessing-the-stream">Accessing the Stream</h2>
+<p>Once services are running:</p>
+<ul>
+<li><strong>HLS (Browser)</strong>:
+<code>http://&lt;raspberry-pi-ip&gt;:8888/dashcam</code></li>
+<li><strong>RTSP (VLC, etc.)</strong>:
+<code>rtsp://&lt;raspberry-pi-ip&gt;:8554/dashcam</code></li>
+<li><strong>MediaMTX API</strong>:
+<code>http://&lt;raspberry-pi-ip&gt;:9997</code></li>
+</ul>
+<p>If using <code>dashcam.local</code> (Avahi/mDNS): -
+<strong>HLS</strong>: <code>http://dashcam.local:8888/dashcam</code> -
+<strong>RTSP</strong>:
+<code>rtsp://dashcam.local:8554/dashcam</code></p>
+<h2 id="systemd-services">Systemd Services</h2>
+<p>Three services are installed:</p>
+<ol type="1">
+<li><strong>dashcam-mediamtx.service</strong> - MediaMTX RTSP/HLS
+server</li>
+<li><strong>dashcam-camera.service</strong> - Camera streaming (depends
+on MediaMTX)</li>
+<li><strong>dashcam-api.service</strong> - REST API microservice
+(optional)</li>
+</ol>
+<h3 id="direct-systemctl-commands">Direct systemctl Commands</h3>
+<p>You can also use systemctl directly:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Status</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status dashcam-mediamtx.service</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status dashcam-camera.service</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart dashcam-mediamtx.service</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart dashcam-camera.service</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Logs</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> dashcam-mediamtx.service <span class="at">-f</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> dashcam-camera.service <span class="at">-f</span></span></code></pre></div>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="services-wont-start">Services won’t start</h3>
+<ol type="1">
+<li><p>Check Docker is running:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status docker</span></code></pre></div></li>
+<li><p>Check for port conflicts:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ss <span class="at">-tulpn</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-E</span> <span class="st">&#39;(8554|8888|9997)&#39;</span></span></code></pre></div></li>
+<li><p>Check logs:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs</span></code></pre></div></li>
+</ol>
+<h3 id="camera-not-streaming">Camera not streaming</h3>
+<ol type="1">
+<li><p>Verify MediaMTX is running:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span></code></pre></div></li>
+<li><p>Check if RTSP port is open:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-tulpn</span> <span class="kw">|</span> <span class="fu">grep</span> 8554</span></code></pre></div></li>
+<li><p>Check camera service logs:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs-camera</span></code></pre></div></li>
+</ol>
+<h3 id="recording-not-working">Recording not working</h3>
+<ol type="1">
+<li><p>Verify recording mode is enabled:</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> mode</span></code></pre></div></li>
+<li><p>Check recordings directory exists and has correct
+permissions:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-la</span> ~/dashcam/recordings</span></code></pre></div></li>
+<li><p>Restart services:</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div></li>
+</ol>
+<h2 id="file-locations">File Locations</h2>
+<ul>
+<li><strong>Configuration</strong>:
+<code>/etc/dashcam/dashcam.conf</code></li>
+<li><strong>Service files</strong>:
+<code>/etc/systemd/system/dashcam-*.service</code></li>
+<li><strong>Scripts</strong>: <code>/usr/local/bin/dashcam-*</code></li>
+<li><strong>CLI tool</strong>:
+<code>/usr/local/bin/dashcamctl</code></li>
+<li><strong>API</strong>:
+<code>/usr/local/bin/dashcam-api.py</code></li>
+<li><strong>Recordings</strong>: <code>~/dashcam/recordings/</code>
+(configurable)</li>
+</ul>
+<h2 id="uninstallation">Uninstallation</h2>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop and disable services</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl stop dashcam-camera.service dashcam-mediamtx.service dashcam-api.service</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl disable dashcam-camera.service dashcam-mediamtx.service dashcam-api.service</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove service files</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /etc/systemd/system/dashcam-<span class="pp">*</span>.service</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove scripts</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /usr/local/bin/dashcam-<span class="pp">*</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /usr/local/bin/dashcamctl</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove configuration</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm <span class="at">-rf</span> /etc/dashcam</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Reload systemd</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span></code></pre></div>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────┐
+│           Systemd Services                   │
+├─────────────────────────────────────────────┤
+│                                              │
+│  ┌──────────────────┐  ┌─────────────────┐ │
+│  │ dashcam-mediamtx │  │ dashcam-camera  │ │
+│  │    (Docker)      │◄─┤   (libcamera)   │ │
+│  └────────┬─────────┘  └─────────────────┘ │
+│           │                                  │
+│           │ RTSP/HLS/API                    │
+│           ▼                                  │
+│  ┌──────────────────┐                       │
+│  │  Network Access  │                       │
+│  │  :8554 :8888     │                       │
+│  └──────────────────┘                       │
+│                                              │
+└─────────────────────────────────────────────┘
+         ▲
+         │ Control
+         │
+┌────────┴─────────┐     ┌──────────────────┐
+│   dashcamctl     │     │  REST API :5000  │
+│   (CLI)          │     │  (Flask)         │
+└──────────────────┘     └──────────────────┘</code></pre>
+<h1 id="dashcam-service---deployment-guide">Dashcam Service - Deployment
+Guide</h1>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before deploying, ensure your Raspberry Pi has:</p>
+<ul>
+<li>✅ Raspberry Pi OS (64-bit recommended)</li>
+<li>✅ Docker installed and running</li>
+<li>✅ Camera module connected and enabled</li>
+<li>✅ Python 3 installed (should be default)</li>
+<li>✅ SSH access enabled (for remote deployment)</li>
+</ul>
+<h2 id="deployment-methods">Deployment Methods</h2>
+<h3 id="method-1-direct-installation-recommended">Method 1: Direct
+Installation (Recommended)</h3>
+<p>If you already have your dashcam scripts on your Raspberry Pi:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SSH into your Raspberry Pi</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> pi@dashcam.local</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Navigate to your dashcam directory</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/dashcam</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy the service files here</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co"># (upload via scp or download from your repository)</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the installer</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x install-dashcam-service.sh</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Start the services</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable auto-start on boot</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Check health</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span></code></pre></div>
+<h3 id="method-2-fresh-installation">Method 2: Fresh Installation</h3>
+<p>Starting from scratch:</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SSH into your Raspberry Pi</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> pi@dashcam.local</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create dashcam directory</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/dashcam</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/dashcam</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Upload all files (from your computer):</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - start_camera_simple.sh</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co"># - start_mediamtx_minimal.sh</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="co"># - start_mediamtx_with_recording.sh</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="co"># - install-dashcam-service.sh</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co"># - dashcamctl</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="co"># - dashcam-api.py</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Make scripts executable</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x <span class="pp">*</span>.sh <span class="pp">*</span>.py dashcamctl</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the installer</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Start services</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span></code></pre></div>
+<h3 id="method-3-remote-deployment-via-scp">Method 3: Remote Deployment
+via SCP</h3>
+<p>From your computer:</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Navigate to the directory with service files</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /path/to/service/files</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy files to Raspberry Pi</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> install-dashcam-service.sh <span class="dt">\</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    dashcamctl <span class="dt">\</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    dashcam-api.py <span class="dt">\</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    pi@dashcam.local:~/dashcam/</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co"># SSH in and install</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> pi@dashcam.local</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/dashcam</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x install-dashcam-service.sh</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span></code></pre></div>
+<h2 id="post-installation-steps">Post-Installation Steps</h2>
+<h3 id="verify-installation">1. Verify Installation</h3>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if services are installed</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> list-unit-files <span class="kw">|</span> <span class="fu">grep</span> dashcam</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># You should see:</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co"># dashcam-mediamtx.service</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># dashcam-camera.service</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># dashcam-api.service</span></span></code></pre></div>
+<h3 id="start-services">2. Start Services</h3>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start all services</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Wait 5-10 seconds for startup</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 10</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check health</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span></code></pre></div>
+<p>Expected output:</p>
+<pre><code>=== Dashcam Health Check ===
+
+Configuration:
+  Mode: minimal
+
+MediaMTX:
+  Service:  ✓ Running
+  RTSP Port: ✓ Port 8554 open
+  API:      ✓ API responding
+
+Camera:
+  Service:  ✓ Running
+  Stream:   ✓ Stream active</code></pre>
+<h3 id="test-streaming">3. Test Streaming</h3>
+<p>From your computer or phone browser: - Visit:
+<code>http://dashcam.local:8888/dashcam</code> - Should show live video
+stream</p>
+<p>Or use VLC: - Open Network Stream:
+<code>rtsp://dashcam.local:8554/dashcam</code></p>
+<h3 id="enable-auto-start-optional-but-recommended">4. Enable Auto-Start
+(Optional but Recommended)</h3>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span></code></pre></div>
+<p>Now services will start automatically on boot.</p>
+<h2 id="configuration-options">Configuration Options</h2>
+<h3 id="change-recording-mode">Change Recording Mode</h3>
+<p>Switch to recording mode (saves video to disk):</p>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode recording</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<p>Switch back to minimal mode (streaming only):</p>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode minimal</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h3 id="modify-settings">Modify Settings</h3>
+<p>Edit the configuration file:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nano /etc/dashcam/dashcam.conf</span></code></pre></div>
+<p>Common settings to change: - <code>MEDIAMTX_MODE</code> - minimal or
+recording - <code>VIDEO_WIDTH</code> / <code>VIDEO_HEIGHT</code> -
+Resolution - <code>FRAMERATE</code> - Frames per second -
+<code>BITRATE</code> - Video bitrate</p>
+<p>After changes:</p>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h2 id="enable-api-microservice-optional">Enable API Microservice
+(Optional)</h2>
+<p>The REST API allows remote control via HTTP:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start the API</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start dashcam-api.service</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable auto-start</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable dashcam-api.service</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Test it</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/health</span></code></pre></div>
+<p>The API will be available at: - Local:
+<code>http://localhost:5000</code> - Network:
+<code>http://dashcam.local:5000</code></p>
+<h2 id="verification-checklist">Verification Checklist</h2>
+<p>After deployment, verify:</p>
+<ul class="task-list">
+<li><input type="checkbox" disabled="" />
+Services are running: <code>dashcamctl status</code></li>
+<li><input type="checkbox" disabled="" />
+Health check passes: <code>dashcamctl health</code></li>
+<li><input type="checkbox" disabled="" />
+Stream accessible via browser:
+<code>http://dashcam.local:8888/dashcam</code></li>
+<li><input type="checkbox" disabled="" />
+No errors in logs: <code>dashcamctl logs</code></li>
+<li><input type="checkbox" disabled="" />
+Services enabled for boot (if desired):
+<code>systemctl is-enabled dashcam-*.service</code></li>
+</ul>
+<h2 id="common-issues">Common Issues</h2>
+<h3 id="docker-not-running">Docker Not Running</h3>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check Docker status</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status docker</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Start Docker</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start docker</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable Docker auto-start</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable docker</span></code></pre></div>
+<h3 id="port-already-in-use">Port Already in Use</h3>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what&#39;s using the ports</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ss <span class="at">-tulpn</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-E</span> <span class="st">&#39;(8554|8888|9997)&#39;</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop conflicting services</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl stop [conflicting-service]</span></code></pre></div>
+<h3 id="camera-not-detected">Camera Not Detected</h3>
+<div class="sourceCode" id="cb47"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check camera connection</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="ex">libcamera-hello</span> <span class="at">--list-cameras</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable camera in raspi-config</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> raspi-config</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Navigate to: Interface Options -&gt; Camera -&gt; Enable</span></span></code></pre></div>
+<h3 id="permission-denied">Permission Denied</h3>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure scripts are executable</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ~/dashcam/<span class="pp">*</span>.sh</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure user &#39;pi&#39; owns the directory</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chown <span class="at">-R</span> pi:pi ~/dashcam</span></code></pre></div>
+<h2 id="updating-the-system">Updating the System</h2>
+<p>To update service files:</p>
+<div class="sourceCode" id="cb49"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop services</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl stop</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Upload new files via scp or edit directly</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Reinstall</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/dashcam</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Start services</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span></code></pre></div>
+<h2 id="uninstalling">Uninstalling</h2>
+<p>To completely remove the dashcam service system:</p>
+<div class="sourceCode" id="cb50"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop and disable services</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl stop dashcam-camera.service dashcam-mediamtx.service dashcam-api.service</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl disable dashcam-camera.service dashcam-mediamtx.service dashcam-api.service</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove service files</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /etc/systemd/system/dashcam-<span class="pp">*</span>.service</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove scripts</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /usr/local/bin/dashcam-<span class="pp">*</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /usr/local/bin/dashcamctl</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove configuration</span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm <span class="at">-rf</span> /etc/dashcam</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Reload systemd</span></span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl daemon-reload</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Optionally remove dashcam directory</span></span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a><span class="co"># rm -rf ~/dashcam</span></span></code></pre></div>
+<h2 id="getting-help">Getting Help</h2>
+<p>If you encounter issues:</p>
+<ol type="1">
+<li>Check logs: <code>dashcamctl logs</code></li>
+<li>Check health: <code>dashcamctl health</code></li>
+<li>Review documentation: <code>cat DASHCAM_SERVICE_DOCS.md</code></li>
+<li>Check service status:
+<code>sudo systemctl status dashcam-mediamtx.service</code></li>
+</ol>
+<h2 id="next-steps">Next Steps</h2>
+<p>After successful deployment:</p>
+<ol type="1">
+<li>✅ Access your stream via browser or VLC</li>
+<li>✅ Set up recording mode if needed</li>
+<li>✅ Enable API for remote control</li>
+<li>✅ Configure auto-start on boot</li>
+<li>✅ Test a reboot to ensure everything starts correctly</li>
+</ol>
+<p>Enjoy your dashcam system!</p>
+<h1 id="dashcam-service-system---file-index">Dashcam Service System -
+File Index</h1>
+<h2 id="overview">Overview</h2>
+<p>This package contains a complete systemd-based service management
+system for your Raspberry Pi dashcam. It transforms your manual scripts
+into fully managed, auto-starting services with health monitoring and
+mode switching capabilities.</p>
+<h2 id="core-components">Core Components</h2>
+<h3 id="installation-setup">Installation &amp; Setup</h3>
+<p><strong>install-dashcam-service.sh</strong> (Executable) - Main
+installation script - Run with:
+<code>sudo ./install-dashcam-service.sh</code> - Installs all services,
+scripts, and configuration - Idempotent - safe to run multiple times</p>
+<h3 id="cli-management-tool">CLI Management Tool</h3>
+<p><strong>dashcamctl</strong> (Executable) - Command-line control
+utility - Usage: <code>dashcamctl [command]</code> - Controls services,
+checks health, switches modes, views logs - Does not require root for
+read-only operations - Requires sudo for service control operations</p>
+<h3 id="rest-api-microservice-1">REST API Microservice</h3>
+<p><strong>dashcam-api.py</strong> (Executable Python Script) -
+Flask-based REST API - Runs on port 5000 - Provides HTTP endpoints for
+health checks and control - Optional - install separately with systemd
+service</p>
+<h3 id="configuration-files">Configuration Files</h3>
+<p><strong>dashcam.conf</strong> - Main configuration file (gets
+installed to /etc/dashcam/) - Defines recording mode, directories, video
+settings - Edit after installation:
+<code>sudo nano /etc/dashcam/dashcam.conf</code></p>
+<h3 id="systemd-service-files">Systemd Service Files</h3>
+<p><strong>dashcam-mediamtx.service</strong> - Systemd service for
+MediaMTX - Manages Docker container lifecycle - Depends on Docker
+service - Gets installed to /etc/systemd/system/</p>
+<p><strong>dashcam-camera-service.service</strong> - Systemd service for
+camera streaming - Depends on MediaMTX being ready - Waits for port 8554
+before starting - Gets installed to /etc/systemd/system/</p>
+<p><strong>dashcam-api.service</strong> - Systemd service for REST API -
+Optional component - Gets installed to /etc/systemd/system/</p>
+<h3 id="wrapper-scripts-installed-to-usrlocalbin">Wrapper Scripts
+(installed to /usr/local/bin/)</h3>
+<p><strong>dashcam-prepare-mediamtx</strong> - Generates MediaMTX config
+based on current mode - Called by systemd before starting MediaMTX</p>
+<p><strong>dashcam-start-mediamtx</strong> - Starts MediaMTX Docker
+container - Loads configuration from /etc/dashcam/dashcam.conf</p>
+<p><strong>dashcam-start-camera</strong> - Starts camera streaming via
+libcamera-vid and ffmpeg - Loads configuration from
+/etc/dashcam/dashcam.conf</p>
+<h2 id="documentation">Documentation</h2>
+<p><strong>DASHCAM_SERVICE_DOCS.md</strong> - Complete documentation -
+Usage examples - API reference - Troubleshooting guide</p>
+<p><strong>DEPLOYMENT_GUIDE.md</strong> - Step-by-step deployment
+instructions - Prerequisites and verification - Common issues and
+solutions</p>
+<p><strong>QUICK_REFERENCE.txt</strong> - One-page command reference -
+Most common operations - Perfect for printing or quick lookup</p>
+<h2 id="utility-scripts">Utility Scripts</h2>
+<p><strong>package-dashcam-service.sh</strong> (Executable) - Packages
+all files into a tarball for easy deployment - Usage:
+<code>./package-dashcam-service.sh</code> - Creates timestamped
+archive</p>
+<h2 id="installation-flow">Installation Flow</h2>
+<ol type="1">
+<li>Copy files to Raspberry Pi dashcam directory</li>
+<li>Run <code>sudo ./install-dashcam-service.sh</code></li>
+<li>Installer creates:
+<ul>
+<li>/etc/dashcam/dashcam.conf (configuration)</li>
+<li>/usr/local/bin/dashcam-* (wrapper scripts)</li>
+<li>/usr/local/bin/dashcamctl (CLI tool)</li>
+<li>/etc/systemd/system/dashcam-*.service (services)</li>
+</ul></li>
+<li>Use <code>dashcamctl</code> to control the system</li>
+</ol>
+<h2 id="architecture-summary">Architecture Summary</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Your Existing Scripts (not modified)                        │
+│ - start_camera_simple.sh                                    │
+│ - start_mediamtx_minimal.sh                                 │
+│ - start_mediamtx_with_recording.sh                          │
+└─────────────────────────────────────────────────────────────┘
+                              ▲
+                              │ Logic extracted into
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│ Wrapper Scripts (in /usr/local/bin/)                        │
+│ - dashcam-prepare-mediamtx                                  │
+│ - dashcam-start-mediamtx                                    │
+│ - dashcam-start-camera                                      │
+└─────────────────────────────────────────────────────────────┘
+                              ▲
+                              │ Called by
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│ Systemd Services (in /etc/systemd/system/)                 │
+│ - dashcam-mediamtx.service                                  │
+│ - dashcam-camera.service (depends on mediamtx)              │
+│ - dashcam-api.service (optional)                            │
+└─────────────────────────────────────────────────────────────┘
+                              ▲
+                              │ Controlled by
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│ Management Tools                                            │
+│ - dashcamctl (CLI)                                          │
+│ - dashcam-api.py (HTTP REST API)                            │
+└─────────────────────────────────────────────────────────────┘
+                              ▲
+                              │ Reads config from
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│ Configuration                                               │
+│ /etc/dashcam/dashcam.conf                                   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="file-permissions-after-installation">File Permissions After
+Installation</h2>
+<pre><code>/etc/dashcam/
+  └── dashcam.conf (644, root:root)
+
+/usr/local/bin/
+  ├── dashcam-prepare-mediamtx (755, root:root)
+  ├── dashcam-start-mediamtx (755, root:root)
+  ├── dashcam-start-camera (755, root:root)
+  ├── dashcamctl (755, root:root)
+  └── dashcam-api.py (755, root:root)
+
+/etc/systemd/system/
+  ├── dashcam-mediamtx.service (644, root:root)
+  ├── dashcam-camera.service (644, root:root)
+  └── dashcam-api.service (644, root:root)</code></pre>
+<h2 id="quick-start-commands">Quick Start Commands</h2>
+<div class="sourceCode" id="cb53"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Installation</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Start services</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable auto-start</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check health</span></span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch mode</span></span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode recording</span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a><span class="co"># View logs</span></span>
+<span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs</span></code></pre></div>
+<h2 id="dependencies">Dependencies</h2>
+<h3 id="required">Required</h3>
+<ul>
+<li>Raspberry Pi OS (64-bit recommended)</li>
+<li>Docker (for MediaMTX)</li>
+<li>libcamera-vid (for camera)</li>
+<li>ffmpeg (for streaming)</li>
+<li>systemd (for service management)</li>
+<li>Python 3 (for API, usually pre-installed)</li>
+</ul>
+<h3 id="optional">Optional</h3>
+<ul>
+<li>Flask (for REST API):
+<code>pip3 install flask --break-system-packages</code></li>
+<li>curl (for API testing)</li>
+<li>Avahi/mDNS (for .local addresses)</li>
+</ul>
+<h2 id="key-features">Key Features</h2>
+<p>✅ <strong>Automatic Dependency Management</strong>: Camera waits for
+MediaMTX to be ready ✅ <strong>Mode Switching</strong>: Easy toggle
+between minimal and recording modes ✅ <strong>Health
+Monitoring</strong>: Comprehensive checks of all components ✅
+<strong>Auto-Restart</strong>: Services automatically restart on failure
+✅ <strong>Boot Integration</strong>: Optional auto-start on system boot
+✅ <strong>Logging</strong>: Full systemd journal integration ✅
+<strong>CLI Control</strong>: User-friendly command-line interface ✅
+<strong>REST API</strong>: Optional HTTP interface for automation ✅
+<strong>Configuration</strong>: Centralized config file</p>
+<h2 id="support-documentation">Support &amp; Documentation</h2>
+<ul>
+<li>Full Documentation: <code>DASHCAM_SERVICE_DOCS.md</code></li>
+<li>Deployment Guide: <code>DEPLOYMENT_GUIDE.md</code></li>
+<li>Quick Reference: <code>QUICK_REFERENCE.txt</code></li>
+<li>Help Command: <code>dashcamctl help</code></li>
+<li>API Documentation: <code>curl http://localhost:5000/</code></li>
+</ul>
+<h2 id="license">License</h2>
+<p>Free to use and modify for your dashcam project.</p>
+<h1 id="dashcam-service-system---complete-package">🎥 Dashcam Service
+System - Complete Package</h1>
+<h2 id="what-youve-got">What You’ve Got</h2>
+<p>I’ve created a <strong>complete systemd-based service management
+system</strong> for your Raspberry Pi dashcam. Your manual scripts are
+now transformed into fully managed services with:</p>
+<ul>
+<li>✅ Automatic startup and dependency management</li>
+<li>✅ Health monitoring and status checks</li>
+<li>✅ Easy mode switching (minimal vs recording)</li>
+<li>✅ Command-line control tool</li>
+<li>✅ REST API microservice for remote control</li>
+<li>✅ Auto-restart on failures</li>
+<li>✅ Comprehensive logging</li>
+</ul>
+<h2 id="package-contents">📦 Package Contents</h2>
+<h3 id="installation-setup-1">🚀 Installation &amp; Setup</h3>
+<ul>
+<li><strong>install-dashcam-service.sh</strong> - One-command
+installer</li>
+<li><strong>dashcam.conf</strong> - Configuration template</li>
+</ul>
+<h3 id="control-tools">🎮 Control Tools</h3>
+<ul>
+<li><strong>dashcamctl</strong> - CLI management tool (the star of the
+show!)</li>
+<li><strong>dashcam-api.py</strong> - REST API microservice
+(optional)</li>
+</ul>
+<h3 id="service-components">⚙️ Service Components</h3>
+<ul>
+<li><strong>dashcam-mediamtx.service</strong> - MediaMTX systemd
+service</li>
+<li><strong>dashcam-camera-service.service</strong> - Camera systemd
+service</li>
+<li><strong>dashcam-api.service</strong> - API systemd service</li>
+</ul>
+<h3 id="internal-scripts">🔧 Internal Scripts</h3>
+<ul>
+<li><strong>dashcam-prepare-mediamtx</strong> - Config generator</li>
+<li><strong>dashcam-start-mediamtx</strong> - MediaMTX launcher</li>
+<li><strong>dashcam-start-camera</strong> - Camera launcher</li>
+</ul>
+<h3 id="documentation-1">📚 Documentation</h3>
+<ul>
+<li><strong>DASHCAM_SERVICE_DOCS.md</strong> - Complete
+documentation</li>
+<li><strong>DEPLOYMENT_GUIDE.md</strong> - Step-by-step setup guide</li>
+<li><strong>QUICK_REFERENCE.txt</strong> - Command cheat sheet</li>
+<li><strong>FILE_INDEX.md</strong> - Detailed file descriptions</li>
+</ul>
+<h3 id="utilities">📦 Utilities</h3>
+<ul>
+<li><strong>package-dashcam-service.sh</strong> - Package creator for
+easy deployment</li>
+</ul>
+<h2 id="quick-installation">🚀 Quick Installation</h2>
+<h3 id="on-your-raspberry-pi">On Your Raspberry Pi:</h3>
+<div class="sourceCode" id="cb54"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Copy files to your dashcam directory</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/dashcam</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Run the installer</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x install-dashcam-service.sh</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> ./install-dashcam-service.sh</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Start services</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Enable auto-start on boot</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Check health</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span></code></pre></div>
+<p><strong>That’s it!</strong> Your dashcam is now a fully managed
+service.</p>
+<h2 id="what-this-solves">🎯 What This Solves</h2>
+<h3 id="before-your-current-setup">Before (Your Current Setup)</h3>
+<ul>
+<li>❌ Manual script execution in separate terminals</li>
+<li>❌ No automatic restart on failures</li>
+<li>❌ No boot-time startup</li>
+<li>❌ Camera could start before MediaMTX was ready</li>
+<li>❌ No easy way to check if everything is working</li>
+<li>❌ Manual mode switching requires editing scripts</li>
+</ul>
+<h3 id="after-with-this-system">After (With This System)</h3>
+<ul>
+<li>✅ Single command to start everything</li>
+<li>✅ Automatic restart on failures</li>
+<li>✅ Optional auto-start on boot</li>
+<li>✅ Camera automatically waits for MediaMTX</li>
+<li>✅ Comprehensive health checks</li>
+<li>✅ Mode switching with one command</li>
+<li>✅ Remote control via REST API</li>
+</ul>
+<h2 id="most-common-commands">🔥 Most Common Commands</h2>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Health check - see if everything is working</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Start/stop/restart services</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl start</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl stop</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch recording modes</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode minimal      <span class="co"># Streaming only</span></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode recording    <span class="co"># Stream + record to disk</span></span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart           <span class="co"># Apply changes</span></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a><span class="co"># View logs</span></span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs                   <span class="co"># All logs</span></span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs-camera            <span class="co"># Camera only</span></span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs-mediamtx          <span class="co"># MediaMTX only</span></span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable/disable auto-start</span></span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl enable            <span class="co"># Start on boot</span></span>
+<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl disable           <span class="co"># Don&#39;t start on boot</span></span>
+<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Get help</span></span>
+<span id="cb55-24"><a href="#cb55-24" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> help</span></code></pre></div>
+<h2 id="rest-api-optional">🌐 REST API (Optional)</h2>
+<p>Enable the REST API for remote control:</p>
+<div class="sourceCode" id="cb56"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl start dashcam-api.service</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable dashcam-api.service</span></code></pre></div>
+<p>Then access it:</p>
+<div class="sourceCode" id="cb57"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Health check</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/health</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get status</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/status</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch mode</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/mode <span class="dt">\</span></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;mode&quot;: &quot;recording&quot;}&#39;</span></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart services</span></span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/restart <span class="dt">\</span></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;service&quot;: &quot;all&quot;}&#39;</span></span></code></pre></div>
+<p>Perfect for: - Web dashboards - Home automation systems - Monitoring
+scripts - Remote management</p>
+<h2 id="health-monitoring">📊 Health Monitoring</h2>
+<p>The <code>dashcamctl health</code> command checks:</p>
+<ul>
+<li>✅ MediaMTX service status</li>
+<li>✅ Camera service status</li>
+<li>✅ RTSP port (8554) availability</li>
+<li>✅ MediaMTX API responsiveness</li>
+<li>✅ Active stream detection</li>
+<li>✅ Current recording mode</li>
+</ul>
+<p>Example output:</p>
+<pre><code>=== Dashcam Health Check ===
+
+Configuration:
+  Mode: minimal
+
+MediaMTX:
+  Service:   ✓ Running
+  RTSP Port: ✓ Port 8554 open
+  API:       ✓ API responding
+
+Camera:
+  Service:   ✓ Running
+  Stream:    ✓ Stream active
+
+Access URLs:
+  HLS:  http://192.168.1.100:8888/dashcam
+  RTSP: rtsp://192.168.1.100:8554/dashcam</code></pre>
+<h2 id="recording-modes-1">🔄 Recording Modes</h2>
+<h3 id="minimal-mode-default">Minimal Mode (Default)</h3>
+<ul>
+<li>Streaming only (RTSP/HLS)</li>
+<li>No disk recording</li>
+<li>Lower resource usage</li>
+<li>Perfect for live monitoring</li>
+</ul>
+<h3 id="recording-mode-2">Recording Mode</h3>
+<ul>
+<li>Streaming + Recording</li>
+<li>Saves to <code>~/dashcam/recordings/</code></li>
+<li>10-second MP4 segments</li>
+<li>Auto-deletes after 24 hours</li>
+<li>Date/time organized</li>
+</ul>
+<p>Switch anytime:</p>
+<div class="sourceCode" id="cb59"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl mode recording</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h2 id="where-everything-lives">📁 Where Everything Lives</h2>
+<p>After installation:</p>
+<pre><code>/etc/dashcam/
+  └── dashcam.conf                    # Main config
+
+/usr/local/bin/
+  ├── dashcamctl                      # CLI tool
+  ├── dashcam-api.py                  # API service
+  ├── dashcam-prepare-mediamtx        # Config generator
+  ├── dashcam-start-mediamtx          # MediaMTX starter
+  └── dashcam-start-camera            # Camera starter
+
+/etc/systemd/system/
+  ├── dashcam-mediamtx.service        # MediaMTX service
+  ├── dashcam-camera.service          # Camera service
+  └── dashcam-api.service             # API service
+
+~/dashcam/
+  ├── recordings/                     # Video recordings (if enabled)
+  └── mediamtx.yml                    # Generated config</code></pre>
+<h2 id="configuration-1">🛠️ Configuration</h2>
+<p>Edit settings anytime:</p>
+<div class="sourceCode" id="cb61"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nano /etc/dashcam/dashcam.conf</span></code></pre></div>
+<p>Common settings: - <code>MEDIAMTX_MODE</code> - minimal or recording
+- <code>VIDEO_WIDTH</code> / <code>VIDEO_HEIGHT</code> - Resolution -
+<code>FRAMERATE</code> - Frames per second - <code>BITRATE</code> -
+Video quality</p>
+<p>After changes:</p>
+<div class="sourceCode" id="cb62"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span></code></pre></div>
+<h2 id="troubleshooting-1">🆘 Troubleshooting</h2>
+<div class="sourceCode" id="cb63"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check what&#39;s wrong</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> health</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View error messages</span></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dashcamctl</span> logs</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Restart everything</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dashcamctl restart</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check individual services</span></span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status dashcam-mediamtx.service</span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status dashcam-camera.service</span></code></pre></div>
+<h2 id="documentation-2">📖 Documentation</h2>
+<ul>
+<li><strong>START HERE</strong>: <code>DEPLOYMENT_GUIDE.md</code> -
+Step-by-step setup</li>
+<li><strong>REFERENCE</strong>: <code>DASHCAM_SERVICE_DOCS.md</code> -
+Complete documentation</li>
+<li><strong>QUICK</strong>: <code>QUICK_REFERENCE.txt</code> - Command
+cheat sheet</li>
+<li><strong>FILES</strong>: <code>FILE_INDEX.md</code> - What each file
+does</li>
+</ul>
+<h2 id="key-concepts">🎓 Key Concepts</h2>
+<h3 id="systemd-services-1">Systemd Services</h3>
+<p>Your scripts are now systemd services that: - Start automatically (if
+enabled) - Restart on failure - Log to system journal - Respect
+dependencies</p>
+<h3 id="service-dependencies">Service Dependencies</h3>
+<p>The camera service automatically waits for MediaMTX to be ready
+before starting. No more timing issues!</p>
+<h3 id="configuration-driven">Configuration-Driven</h3>
+<p>Change settings in one place
+(<code>/etc/dashcam/dashcam.conf</code>), and everything adapts.</p>
+<h3 id="health-monitoring-1">Health Monitoring</h3>
+<p>Know instantly if something is wrong with comprehensive checks.</p>
+<h2 id="next-steps-1">🚦 Next Steps</h2>
+<ol type="1">
+<li><strong>Install</strong>: Run
+<code>install-dashcam-service.sh</code></li>
+<li><strong>Start</strong>: <code>sudo dashcamctl start</code></li>
+<li><strong>Test</strong>: Visit
+<code>http://dashcam.local:8888/dashcam</code> in browser</li>
+<li><strong>Enable</strong>: <code>sudo dashcamctl enable</code> for
+auto-start</li>
+<li><strong>Optional</strong>: Enable API with
+<code>sudo systemctl start dashcam-api.service</code></li>
+</ol>
+<h2 id="benefits">🎉 Benefits</h2>
+<ul>
+<li><strong>Reliability</strong>: Auto-restart on failures</li>
+<li><strong>Simplicity</strong>: Single command control</li>
+<li><strong>Flexibility</strong>: Easy mode switching</li>
+<li><strong>Monitoring</strong>: Know when something breaks</li>
+<li><strong>Automation</strong>: Optional REST API for integration</li>
+<li><strong>Professional</strong>: Production-ready service
+management</li>
+</ul>
+<h2 id="pro-tips">💡 Pro Tips</h2>
+<ol type="1">
+<li>Use <code>dashcamctl health</code> before asking “why isn’t it
+working?”</li>
+<li>Enable auto-start on boot for true “set and forget”</li>
+<li>Check logs with <code>dashcamctl logs</code> when
+troubleshooting</li>
+<li>Use the REST API to integrate with home automation</li>
+<li>Print <code>QUICK_REFERENCE.txt</code> and keep it handy</li>
+</ol>
+<hr />
+<p><strong>Ready to transform your dashcam into a professional
+service?</strong></p>
+<p>Start with the <code>DEPLOYMENT_GUIDE.md</code> for step-by-step
+instructions!</p>

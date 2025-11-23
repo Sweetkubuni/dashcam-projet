@@ -1,5 +1,6 @@
 #!/bin/bash
 # install-dashcam-service.sh - Install dashcam as a systemd service
+# FIXED: Auto-detects current user instead of hardcoding 'pi'
 
 set -e
 
@@ -18,6 +19,22 @@ if [ "$EUID" -ne 0 ]; then
     echo "Please run: sudo ./install-dashcam-service.sh"
     exit 1
 fi
+
+# Detect the actual user (not root)
+ACTUAL_USER="${SUDO_USER:-$USER}"
+if [ "$ACTUAL_USER" = "root" ]; then
+    echo -e "${YELLOW}Warning: Could not detect non-root user${NC}"
+    echo -n "Enter the username to run services as [pi]: "
+    read USER_INPUT
+    ACTUAL_USER="${USER_INPUT:-pi}"
+fi
+
+# Get user's home directory
+USER_HOME=$(eval echo ~$ACTUAL_USER)
+
+echo "Detected user: $ACTUAL_USER"
+echo "Home directory: $USER_HOME"
+echo ""
 
 # Check if we're in the right directory
 if [ ! -f "start_camera_simple.sh" ]; then
@@ -236,7 +253,7 @@ echo -e "${GREEN}✓${NC} Installed dashcam-start-camera"
 # Step 4: Install systemd service files
 echo "Installing systemd service files..."
 
-cat > /etc/systemd/system/dashcam-mediamtx.service << 'EOF'
+cat > /etc/systemd/system/dashcam-mediamtx.service << EOF
 [Unit]
 Description=MediaMTX RTSP/HLS Server for Dashcam
 After=network-online.target docker.service
@@ -245,8 +262,8 @@ Requires=docker.service
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/dashcam
+User=$ACTUAL_USER
+WorkingDirectory=$INSTALL_DIR
 EnvironmentFile=/etc/dashcam/dashcam.conf
 
 # Stop any existing mediamtx container
@@ -272,7 +289,7 @@ EOF
 
 echo -e "${GREEN}✓${NC} Created dashcam-mediamtx.service"
 
-cat > /etc/systemd/system/dashcam-camera.service << 'EOF'
+cat > /etc/systemd/system/dashcam-camera.service << EOF
 [Unit]
 Description=Dashcam Camera Stream
 After=dashcam-mediamtx.service
@@ -280,8 +297,8 @@ Requires=dashcam-mediamtx.service
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/dashcam
+User=$ACTUAL_USER
+WorkingDirectory=$INSTALL_DIR
 EnvironmentFile=/etc/dashcam/dashcam.conf
 
 # Wait for MediaMTX to be ready
@@ -352,12 +369,17 @@ echo -e "${GREEN}✓${NC} Systemd reloaded"
 # Step 8: Create recordings directory
 echo "Creating recordings directory..."
 mkdir -p "$INSTALL_DIR/recordings"
-chown pi:pi "$INSTALL_DIR/recordings"
+chown $ACTUAL_USER:$ACTUAL_USER "$INSTALL_DIR/recordings"
 echo -e "${GREEN}✓${NC} Created recordings directory"
 
 # Summary
 echo ""
 echo -e "${GREEN}=== Installation Complete ===${NC}"
+echo ""
+echo "Detected configuration:"
+echo "  User: $ACTUAL_USER"
+echo "  Home: $USER_HOME"
+echo "  Install directory: $INSTALL_DIR"
 echo ""
 echo "Services installed:"
 echo "  • dashcam-mediamtx.service"

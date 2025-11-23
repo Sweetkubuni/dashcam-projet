@@ -1,0 +1,16 @@
+# Minimal MediaMTX configuration
+logLevel: info
+logDestinations: [stdout]
+
+# RTSP server
+rtspAddress: :8554
+
+# HLS server
+hlsAddress: :8888
+
+# HTTP API server
+apiAddress: :9997
+
+# Path configuration
+paths:
+  dashcam:
